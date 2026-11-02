@@ -4,16 +4,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 :root{--ac:#6b1d2a;--gd:#9a7b43;--bg:#f2f3f5;--cd:#fff;--bd:#d3d7de;--tx:#1b2230;--mu:#5b6575;--sf:Georgia,"Times New Roman",serif}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--tx)}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--tx)}
 header{background:var(--ac);color:#fff;padding:22px 16px 18px;text-align:center;border-bottom:4px solid var(--gd)}
 header h1{margin:0;font-family:var(--sf);font-size:1.3rem;font-weight:700;letter-spacing:.08em}header small{display:block;margin-top:4px;opacity:.8;font-family:var(--sf);font-style:italic}
 main{max-width:760px;margin:0 auto;padding:16px 14px}
+.tabs{display:flex;gap:6px;max-width:760px;margin:12px auto 0;padding:0 14px}
+.tabs button{flex:1;padding:11px;border:1px solid var(--bd);background:#e6e8ec;border-radius:3px;font-family:var(--sf);font-size:.95rem;font-weight:700;color:var(--mu);cursor:pointer}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac);border-bottom:3px solid var(--gd)}
 .card{background:var(--cd);border:1px solid var(--bd);border-top:3px solid var(--ac);border-radius:3px;padding:16px;margin-bottom:14px}
 .card h2{margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--bd);font-family:var(--sf);font-size:1rem;font-weight:700;color:var(--ac)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:560px){.grid{grid-template-columns:1fr}}
 label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:3px}
 input,select,textarea{width:100%;padding:9px;border:1px solid #b9bfca;border-radius:3px;font:inherit;background:#fff;color:var(--tx)}
-input:focus,select:focus,textarea:focus,.sc button:focus-visible,.btn:focus-visible{outline:2px solid var(--gd);outline-offset:1px}
+input:focus,select:focus,textarea:focus,.sc button:focus-visible,.btn:focus-visible,.tabs button:focus-visible,.mini:focus-visible{outline:2px solid var(--gd);outline-offset:1px}
 textarea{min-height:56px;resize:vertical}
 .row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #e6e9ee}
 .row span{font-size:.92rem;flex:1}
@@ -25,6 +28,12 @@ textarea{min-height:56px;resize:vertical}
 .btn:disabled{opacity:.7;cursor:wait}
 .note{font-size:.78rem;color:var(--mu);text-align:center;margin:6px 0}
 .ket{font-size:.8rem;color:var(--mu);line-height:1.5}
+.hh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.hh b{font-family:var(--sf);font-size:1.02rem;color:var(--ac)}
+.ov{text-align:center;min-width:64px;padding:4px 8px;border:1px solid var(--gd);border-radius:3px;font-family:var(--sf);font-size:1.25rem;font-weight:700;color:var(--ac)}.ov small{display:block;font-size:.68rem;font-weight:400;color:var(--mu)}
+.bt{margin-top:12px;display:flex;gap:8px}
+.mini{padding:8px 12px;border:1px solid var(--ac);border-radius:3px;background:#fff;color:var(--ac);font-weight:600;cursor:pointer}.mini:hover{background:var(--ac);color:#fff}.mini:disabled{opacity:.6;cursor:wait}
+.empty{text-align:center;color:var(--mu);padding:28px 10px;font-size:.9rem}
 #stage{position:fixed;left:-10000px;top:0}
 #rapor{width:794px;min-width:794px;max-width:794px;margin:0;padding:0;background:#fff;color:#111;font:12px/1.45 "Times New Roman",Georgia,serif}
 #rapor .pg{width:794px;height:1110px;padding:30px 36px;box-sizing:border-box;overflow:hidden;position:relative;background:#fff}#rapor .pg+.pg{page-break-before:always}#rapor .pn{position:absolute;left:36px;right:36px;bottom:12px;padding-top:5px;border-top:3px double #6b1d2a;text-align:center;font-size:10px;color:#333}#rapor h1{text-align:center;margin:0;font-size:20px;letter-spacing:2px;color:#6b1d2a}
@@ -37,7 +46,10 @@ textarea{min-height:56px;resize:vertical}
 #rapor .ft{text-align:center;margin-top:14px;padding-top:8px;border-top:3px double #6b1d2a;font-size:11px;color:#333}
 </style></head><body>
 <header><h1>DOREMI HOME MUSIC COURSE</h1><small>Form Lapor Perkembangan Pembelajaran</small></header>
-<main>
+<nav class="tabs" role="tablist"><button type="button" id="tForm" class="on" role="tab">📝 Isi Rapor</button><button type="button" id="tHist" role="tab">📚 Riwayat Rapor</button></nav>
+
+<!-- ===== TAMPILAN 1: FORM ===== -->
+<main id="vForm">
 <div class="note" id="mode"></div>
 <div class="card"><h2>Identitas</h2><div class="grid">
 <div><label>Guru pengajar</label><select id="guru"></select></div>
@@ -60,6 +72,19 @@ textarea{min-height:56px;resize:vertical}
 <button class="btn" id="go">Buat PDF &amp; Simpan</button>
 <div class="note" id="st" style="font-weight:600"></div><div class="note">PDF terunduh otomatis. Data juga tersimpan ke Google Sheets (sheet "Rapor").</div>
 </main>
+
+<!-- ===== TAMPILAN 2: RIWAYAT ===== -->
+<main id="vHist" hidden>
+<div class="card"><h2>Filter Riwayat</h2><div class="grid">
+<div><label>Guru</label><select id="hGuru"></select></div>
+<div><label>Siswa</label><select id="hSiswa"></select></div>
+<div><label>Alat musik</label><select id="hAlat"></select></div>
+<div><label>Cari periode</label><input id="hQ" placeholder="mis. Nov 2026"></div></div>
+<div class="bt"><button type="button" class="mini" id="hRef">↻ Muat ulang</button></div>
+<div class="note" id="hInfo"></div></div>
+<div id="hList"></div>
+</main>
+
 <div id="stage"><div id="rapor"></div></div>
 <script>
 // ===== KONFIGURASI =====
@@ -74,13 +99,13 @@ Piano:{A:'Menghafal melodi|Ketepatan nada|Ketepatan ritme|Kelancaran memainkan l
 Vocal:{A:'Menghafal lirik|Ketepatan melodi|Ketepatan ritme|Intonasi|Artikulasi lirik|Ekspresi & interpretasi',B:'Mengenal notasi|Nilai not & ritme|Tanda birama|Tempo|Dinamik|Membaca melodi sederhana',Ct:'TEKNIK VOCAL',C:'Postur|Pernapasan diafragma|Vocal warm-up|Resonansi|Artikulasi|Kontrol suara|Range vokal|Dinamika & phrasing',Dt:'SOLFEGIO / MUSICAL EAR',D:'Mengenali tinggi-rendah nada|Menirukan nada|Solmisasi|Membaca melodi|Mengenali interval|Menjaga pitch|Menjaga ritme',F:'REPERTOIRE|TEKNIK VOCAL|INTONASI|SOLFEGIO'}};
 const DUR=['10–15 menit','15–20 menit','20–30 menit','30+ menit'],FOK=['Materi lagu','Teknik','Theory','Solfegio/Rhythm','Metronom','Review materi'];
 const RK=['Song / Repertoire','Theory','Teknik Utama','Musical Ear / Solfegio'];
-const msg=(t,err)=>{const e=document.getElementById('st');e.textContent=t;e.style.color=err?'#b91c1c':'#047857'};const $=i=>document.getElementById(i),esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const msg=(t,err)=>{const e=document.getElementById('st');e.textContent=t;e.style.color=err?'#b91c1c':'#047857'};const $=i=>document.getElementById(i),esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let DATA=[],S={};
 const secs=a=>{const t=T[a];return[['A','A. SONG / REPERTOIRE',t.A.split('|')],['B','B. THEORY / TEORI MUSIK',t.B.split('|')],['C','C. '+t.Ct,t.C.split('|')],['D','D. '+t.Dt,t.D.split('|')]]};
 const opts=(el,arr,ph)=>{el.innerHTML=(ph?'<option value="">'+ph+'</option>':'')+arr.map(v=>'<option>'+esc(v)+'</option>').join('')};
 const uniq=a=>[...new Set(a)].sort();
 function avg(k,a){const n=secs(a).find(s=>s[0]==k)[2].map((_,i)=>S[k+i]).filter(Boolean);return n.length?n.reduce((x,y)=>x+y,0)/n.length:null}
-const f1=v=>v==null?'–':(Math.round(v*10)/10).toString().replace('.',',');
+const f1=v=>v==null||isNaN(v)?'–':(Math.round(v*10)/10).toString().replace('.',',');
 function overall(a){const v=['A','B','C','D'].map(k=>avg(k,a)).filter(x=>x!=null);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null}
 function renderForm(){const a=$('alat').value;if(!a){$('secs').innerHTML='';$('tg').innerHTML='';$('rekap').innerHTML='';return}
  $('secs').innerHTML=secs(a).map(([k,t,items])=>'<div class="card"><h2>'+esc(t)+'</h2>'+items.map((n,i)=>'<div class="row"><span>'+esc(n)+'</span><div class="sc" data-k="'+k+i+'">'+[1,2,3,4].map(v=>'<button type="button" data-v="'+v+'" class="'+(S[k+i]==v?'on':'')+'">'+v+'</button>').join('')+'</div></div>').join('')+'<label style="margin-top:8px">Catatan guru</label><textarea id="cat'+k+'"></textarea></div>').join('');
@@ -92,12 +117,13 @@ $('fok').innerHTML=FOK.map(d=>'<label><input type="checkbox" value="'+d+'">'+d+'
 $('guru').onchange=()=>{const g=$('guru').value;$('gTtd').value=g;opts($('siswa'),uniq(DATA.filter(r=>r.guru==g).map(r=>r.siswa)),'— pilih siswa —');$('siswa').onchange()};
 $('siswa').onchange=()=>{const m=DATA.filter(r=>r.guru==$('guru').value&&r.siswa==$('siswa').value).map(r=>String(r.alat).trim()).map(x=>Object.keys(T).find(k=>x.toLowerCase().startsWith(k.toLowerCase()))).filter(Boolean);const rawN=DATA.filter(r=>r.guru==$('guru').value&&r.siswa==$('siswa').value).length;const l=m.length?uniq(m):(rawN?[]:Object.keys(T));msg(rawN&&!m.length?'Belum ada template rapor untuk alat musik siswa ini (mis. Mandarin).':'',1);const old=$('alat').value;opts($('alat'),l,l.length>1?'— pilih alat —':'');if(l.includes(old))$('alat').value=old;if(l.length==1)$('alat').value=l[0];S={};renderForm()};
 $('alat').onchange=()=>{S={};renderForm()};
-function build(d){const a=d.alat,b=secs(a);
- const tb=b.map(([k,t,items])=>'<div class="sec"><div class="sh">'+esc(t)+'</div><table><tr><th>Kompetensi</th><th>Nilai</th></tr>'+items.map((n,i)=>'<tr><td>'+esc(n)+'</td><td class="n">'+(S[k+i]||'___')+' / 4</td></tr>').join('')+'</table><div class="ct"><b>Catatan guru:</b> '+esc($('cat'+k).value)+'</div></div>').join('');
+// build(d) membaca nilai dari d (d.skor lewat S, d.cat, d.tg) sehingga bisa dipakai ulang untuk riwayat
+function build(d){const a=d.alat,b=secs(a),cat=d.cat||{},tgv=d.tg||[],fokus=d.fokus||[];
+ const tb=b.map(([k,t,items])=>'<div class="sec"><div class="sh">'+esc(t)+'</div><table><tr><th>Kompetensi</th><th>Nilai</th></tr>'+items.map((n,i)=>'<tr><td>'+esc(n)+'</td><td class="n">'+(S[k+i]||'___')+' / 4</td></tr>').join('')+'</table><div class="ct"><b>Catatan guru:</b> '+esc(cat[k])+'</div></div>').join('');
  const rk='<div class="sec"><div class="sh">E. REKAP PERKEMBANGAN</div><table><tr><th>Bidang</th><th>Nilai</th></tr>'+RK.map((n,i)=>'<tr><td>'+n+'</td><td class="n">'+f1(avg('ABCD'[i],a))+' / 4</td></tr>').join('')+'<tr><td><b>Perkembangan Keseluruhan</b></td><td class="n"><b>'+f1(overall(a))+' / 4</b></td></tr></table></div>';
  const ket='<div class="sec"><div class="sh">KETERANGAN NILAI</div><div class="ct">4 — SANGAT BAIK: menguasai materi dan mampu menerapkannya secara mandiri.<br>3 — BAIK: memahami dan menerapkan materi dengan sedikit bimbingan.<br>2 — BERKEMBANG: mulai memahami materi dan masih membutuhkan latihan.<br>1 — PERLU BIMBINGAN: membutuhkan pendampingan dan latihan lebih konsisten.</div></div>';
- const tg='<div class="sec"><div class="sh">F. TARGET PERIODE BERIKUTNYA</div><table>'+T[a].F.split('|').map((l,i)=>'<tr><td style="width:170px"><b>'+esc(l)+'</b></td><td>'+esc($('tg'+i).value)+'</td></tr>').join('')+'</table></div>';
- const g='<div class="sec"><div class="sh">G. REKOMENDASI LATIHAN DI RUMAH</div><div class="ct"><b>Durasi:</b> '+DUR.map(x=>(d.dur==x?'☑ ':'☐ ')+x).join(' &nbsp; ')+' / hari<br><b>Fokus latihan:</b> '+FOK.map(x=>(d.fokus.includes(x)?'☑ ':'☐ ')+x).join(' &nbsp; ')+'<br><b>Catatan untuk orang tua:</b> '+esc(d.cOrtu)+'</div></div>';
+ const tg='<div class="sec"><div class="sh">F. TARGET PERIODE BERIKUTNYA</div><table>'+T[a].F.split('|').map((l,i)=>'<tr><td style="width:170px"><b>'+esc(l)+'</b></td><td>'+esc(tgv[i])+'</td></tr>').join('')+'</table></div>';
+ const g='<div class="sec"><div class="sh">G. REKOMENDASI LATIHAN DI RUMAH</div><div class="ct"><b>Durasi:</b> '+DUR.map(x=>(d.dur==x?'☑ ':'☐ ')+x).join(' &nbsp; ')+' / hari<br><b>Fokus latihan:</b> '+FOK.map(x=>(fokus.includes(x)?'☑ ':'☐ ')+x).join(' &nbsp; ')+'<br><b>Catatan untuk orang tua:</b> '+esc(d.cOrtu)+'</div></div>';
  const h='<div class="sec"><div class="sh">H. PESAN GURU</div><div class="ct"><i>“Setiap anak memiliki proses belajar yang berbeda. Yang terpenting adalah konsistensi, keberanian mencoba, dan perkembangan dari waktu ke waktu.”</i><br><b>Catatan khusus:</b> '+esc(d.cKhusus)+'</div></div>';
  const html='<h1>DOREMI HOME MUSIC COURSE</h1><h2>LAPOR PERKEMBANGAN PEMBELAJARAN '+a.toUpperCase()+'</h2><div class="meta"><div><b>Nama Siswa:</b> '+esc(d.siswa)+'</div><div><b>Level:</b> '+esc(d.level)+'</div><div><b>Nama Guru:</b> '+esc(d.guru)+'</div><div><b>Periode:</b> '+esc(d.periode)+'</div><div><b>Tanggal Evaluasi:</b> '+esc(d.tanggal)+'</div><div><b>Kelas:</b> '+esc(d.kelas)+'</div></div>'+tb+rk+ket+tg+g+h+'<div class="sg"><div>Guru Pengajar<div class="ln"></div>Nama: '+(d.gttd?esc(d.gttd):'<span class="dt">&nbsp;</span>')+'</div><div>Orang Tua/Wali<div class="ln"></div>Nama: '+(d.ortu?esc(d.ortu):'<span class="dt">&nbsp;</span>')+'</div></div>';paginate(html)}
 function paginate(html){const r=$('rapor');r.innerHTML='<div class="pg" style="height:auto;overflow:visible">'+html+'</div>';
@@ -106,13 +132,55 @@ function paginate(html){const r=$('rapor');r.innerHTML='<div class="pg" style="h
  bl.forEach(b=>{const f=b.els[0],l=b.els[b.els.length-1];b.h=l.getBoundingClientRect().bottom+mb(l)-(f.getBoundingClientRect().top-mt(f))+2});
  const AV=1110-30-44,pages=[[]];let used=0;bl.forEach(b=>{if(used+b.h>AV&&pages[pages.length-1].length){pages.push([]);used=0}pages[pages.length-1].push(b);used+=b.h});
  r.innerHTML=pages.map((p,i)=>'<div class="pg">'+p.map(b=>b.els.map(e=>e.outerHTML).join('')).join('')+'<div class="pn"><b>DOREMI HOME MUSIC COURSE</b> — “Belajar Musik, Tumbuh Bersama Musik.” &nbsp;|&nbsp; Halaman '+(i+1)+' dari '+pages.length+'</div></div>').join('')}
+// ===== PDF (dipakai form & riwayat) =====
+async function mkpdf(d){window.scrollTo(0,0);await new Promise(r=>setTimeout(r,150));
+ await html2pdf().set({margin:0,filename:'Rapor_'+d.alat+'_'+String(d.siswa).replace(/\s+/g,'_')+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,scrollX:0,scrollY:0,x:0,y:0,width:794,windowWidth:794,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4'},pagebreak:{mode:['css']}}).from($('rapor')).save()}
 $('go').onclick=async()=>{const a=$('alat').value,s=$('siswa').value;if(!a||!s){msg('Pilih guru, siswa, dan alat musik dulu.',1);return}
  const miss=secs(a).reduce((n,[k,,it])=>n+it.filter((_,i)=>!S[k+i]).length,0);if(miss)msg(miss+' kompetensi belum dinilai, PDF tetap dibuat.');
- const d={siswa:s,guru:$('guru').value,alat:a,level:$('level').value,kelas:$('kelas').value,periode:$('periode').value,tanggal:$('tgl').value,ortu:$('ortu').value,gttd:$('gTtd').value,dur:(document.querySelector('input[name=dur]:checked')||{}).value||'',fokus:[...document.querySelectorAll('#fok input:checked')].map(x=>x.value),cOrtu:$('cOrtu').value,cKhusus:$('cKhusus').value,rekap:'ABCD'.split('').map(k=>avg(k,a)),overall:overall(a),skor:S};
- build(d);$('go').disabled=true;$('go').textContent='Membuat PDF…';window.scrollTo(0,0);await new Promise(r=>setTimeout(r,150));
- try{await html2pdf().set({margin:0,filename:'Rapor_'+a+'_'+s.replace(/\s+/g,'_')+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,scrollX:0,scrollY:0,x:0,y:0,width:794,windowWidth:794,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4'},pagebreak:{mode:['css']}}).from($('rapor')).save();msg('PDF selesai dibuat. Cek folder Downloads.')}catch(e){msg('Gagal membuat PDF: '+e.message,1)}
+ const d={ts:new Date().toISOString(),siswa:s,guru:$('guru').value,alat:a,level:$('level').value,kelas:$('kelas').value,periode:$('periode').value,tanggal:$('tgl').value,ortu:$('ortu').value,gttd:$('gTtd').value,dur:(document.querySelector('input[name=dur]:checked')||{}).value||'',fokus:[...document.querySelectorAll('#fok input:checked')].map(x=>x.value),cOrtu:$('cOrtu').value,cKhusus:$('cKhusus').value,rekap:'ABCD'.split('').map(k=>avg(k,a)),overall:overall(a),skor:S,
+  cat:{A:$('catA').value,B:$('catB').value,C:$('catC').value,D:$('catD').value},tg:T[a].F.split('|').map((_,i)=>$('tg'+i).value)};
+ build(d);$('go').disabled=true;$('go').textContent='Membuat PDF…';
+ try{await mkpdf(d);msg('PDF selesai dibuat. Cek folder Downloads.')}catch(e){msg('Gagal membuat PDF: '+e.message,1)}
+ saveLocal(d);HLOADED=false;
  if(SCRIPT_URL){try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(d)})}catch(e){}}
  $('go').disabled=false;$('go').textContent='Buat PDF & Simpan'};
+
+// ===== RIWAYAT =====
+const LK='doremi_rapor_riwayat';let HIST=[],HLOADED=false;
+const loadLocal=()=>{try{return JSON.parse(localStorage.getItem(LK)||'[]')}catch(e){return[]}};
+const saveLocal=d=>{try{const a=loadLocal();a.unshift(d);localStorage.setItem(LK,JSON.stringify(a.slice(0,200)))}catch(e){}};
+function norm(r){let o=Object.assign({},r);if(typeof r.json==='string'&&r.json){try{o=Object.assign(o,JSON.parse(r.json))}catch(e){}}
+ ['skor','cat','rekap','tg','fokus'].forEach(k=>{if(typeof o[k]==='string'&&o[k]){try{o[k]=JSON.parse(o[k])}catch(e){o[k]=null}}});
+ o.skor=o.skor||{};return o}
+async function loadHist(){$('hInfo').textContent='Memuat riwayat…';let s=[];
+ if(SCRIPT_URL){try{const x=await(await fetch(SCRIPT_URL+'?action=riwayat')).json();if(Array.isArray(x))s=x.map(norm)}catch(e){}}
+ const seen=new Set(s.map(r=>r.ts).filter(Boolean));
+ HIST=s.concat(loadLocal().map(norm).filter(r=>!r.ts||!seen.has(r.ts))).filter(r=>r.siswa);
+ HIST.sort((a,b)=>String(b.ts||b.tanggal||'').localeCompare(String(a.ts||a.tanggal||'')));
+ HLOADED=true;fillHF();renderHist()}
+function fillHF(){const g=$('hGuru').value,sw=$('hSiswa').value,al=$('hAlat').value;
+ opts($('hGuru'),uniq(HIST.map(r=>r.guru).filter(Boolean)),'Semua guru');$('hGuru').value=g;
+ const base=HIST.filter(r=>!$('hGuru').value||r.guru==$('hGuru').value);
+ opts($('hSiswa'),uniq(base.map(r=>r.siswa)),'Semua siswa');$('hSiswa').value=sw;
+ opts($('hAlat'),uniq(HIST.map(r=>r.alat).filter(Boolean)),'Semua alat');$('hAlat').value=al}
+const hFilt=()=>{const g=$('hGuru').value,s=$('hSiswa').value,a=$('hAlat').value,q=$('hQ').value.trim().toLowerCase();
+ return HIST.map((r,i)=>[r,i]).filter(([r])=>(!g||r.guru==g)&&(!s||r.siswa==s)&&(!a||r.alat==a)&&(!q||String(r.periode||'').toLowerCase().includes(q)))};
+function renderHist(){const L=hFilt();$('hInfo').textContent=HIST.length?L.length+' dari '+HIST.length+' rapor':'';
+ $('hList').innerHTML=L.length?L.map(([r,i])=>{const rek=Array.isArray(r.rekap)?r.rekap:[];const ok=T[r.alat]&&Object.keys(r.skor).length;
+  return '<div class="card"><div class="hh"><div><b>'+esc(r.siswa)+'</b><div class="ket">'+esc(r.alat)+(r.level?' · Level '+esc(r.level):'')+(r.kelas?' · '+esc(r.kelas):'')+'<br>Periode: '+esc(r.periode||'–')+' · Evaluasi: '+esc(r.tanggal||'–')+'<br>Guru: '+esc(r.guru||'–')+'</div></div><div class="ov">'+f1(r.overall)+'<small>/ 4</small></div></div>'
+  +'<div class="rk">'+RK.map((n,k)=>'<span>'+n+'</span><b>'+f1(rek[k])+' / 4</b>').join('')+'</div>'
+  +'<div class="bt"><button type="button" class="mini" data-i="'+i+'"'+(ok?'':' disabled title="Data nilai tidak lengkap"')+'>⬇ Unduh ulang PDF</button></div></div>'}).join(''):'<div class="empty">'+(HIST.length?'Tidak ada rapor yang cocok dengan filter.':'Belum ada riwayat rapor.')+'</div>'}
+['hGuru','hSiswa','hAlat'].forEach(id=>$(id).onchange=()=>{if(id=='hGuru')$('hSiswa').value='';fillHF();renderHist()});
+$('hQ').oninput=renderHist;$('hRef').onclick=loadHist;
+$('hList').addEventListener('click',async e=>{const b=e.target.closest('button[data-i]');if(!b)return;const r=HIST[+b.dataset.i];if(!r)return;
+ const old=S,t=b.textContent;b.disabled=true;b.textContent='Membuat PDF…';S=r.skor;
+ try{build(r);await mkpdf(r)}catch(x){alert('Gagal membuat PDF: '+x.message)}
+ S=old;b.disabled=false;b.textContent=t});
+
+// ===== TAB =====
+function tab(h){$('vForm').hidden=h;$('vHist').hidden=!h;$('tForm').classList.toggle('on',!h);$('tHist').classList.toggle('on',h);window.scrollTo(0,0);if(h&&!HLOADED)loadHist()}
+$('tForm').onclick=()=>tab(false);$('tHist').onclick=()=>tab(true);
+
 (async()=>{if(SCRIPT_URL){try{DATA=await(await fetch(SCRIPT_URL+'?action=siswaGuru')).json()}catch(e){}}
  if(!DATA.length){DATA=SAMPLE;$('mode').textContent='Mode contoh: isi SCRIPT_URL agar data siswa & guru diambil dari sheet.'}
  opts($('guru'),uniq(DATA.map(r=>r.guru)),'— pilih guru —');opts($('siswa'),[],'— pilih siswa —');opts($('alat'),[],'');$('tgl').valueAsDate=new Date()})();
