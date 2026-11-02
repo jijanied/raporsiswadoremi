@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rapor Perkembangan – Doremi Home Music Course</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{--ac:#ea580c;--bg:#f5f6fa;--cd:#fff;--bd:#dfe2ea;--tx:#1f2430;--mu:#6b7280}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--tx)}
+header{background:var(--ac);color:#fff;padding:18px 16px;text-align:center}header h1{margin:0;font-size:1.15rem}header small{opacity:.85}
+main{max-width:760px;margin:0 auto;padding:14px}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:1rem;color:var(--ac)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:3px}
+input,select,textarea{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;font:inherit;background:#fff;color:var(--tx)}
+textarea{min-height:56px;resize:vertical}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed var(--bd)}
+.row span{font-size:.92rem;flex:1}
+.sc{display:flex;gap:5px}.sc button{width:38px;height:38px;border-radius:8px;border:1px solid var(--bd);background:#fff;font-weight:600;cursor:pointer;color:var(--tx)}
+.sc button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.rk{display:grid;grid-template-columns:1fr auto;gap:6px;font-size:.92rem}.rk b{text-align:right}
+.chk label{display:inline-flex;align-items:center;gap:5px;margin:0 12px 6px 0;font-size:.9rem;color:var(--tx)}.chk input{width:auto}
+.btn{width:100%;padding:13px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:1rem;font-weight:600;cursor:pointer}
+.note{font-size:.78rem;color:var(--mu);text-align:center;margin:6px 0}
+.ket{font-size:.8rem;color:var(--mu);line-height:1.5}
+#stage{position:fixed;left:-10000px;top:0}
+#rapor{width:794px;min-width:794px;max-width:794px;margin:0;padding:28px 34px;background:#fff;color:#111;font:12px/1.4 Arial,sans-serif}
+#rapor h1{text-align:center;margin:0;font-size:18px;color:#c2410c}#rapor h2{text-align:center;margin:2px 0 10px;font-size:13px}
+#rapor .meta{display:grid;grid-template-columns:1fr 1fr;gap:3px 20px;margin-bottom:8px}
+#rapor .sec{break-inside:avoid;margin-top:9px}#rapor .sh{background:#c2410c;color:#fff;padding:3px 7px;font-weight:700;font-size:12px}
+#rapor table{width:100%;border-collapse:collapse}#rapor td,#rapor th{border:1px solid #bbb;padding:2px 6px}#rapor td.n{width:70px;text-align:center}
+#rapor th{background:#ffedd5;text-align:left}.ct{border:1px solid #bbb;border-top:0;padding:3px 6px;min-height:20px}
+#rapor .sg{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:14px;text-align:center}#rapor .ln{border-bottom:1px solid #111;height:46px;margin:4px 20px}
+#rapor .ft{text-align:center;margin-top:12px;font-size:11px;color:#444}
+</style></head><body>
+<header><h1>DOREMI HOME MUSIC COURSE</h1><small>Form Lapor Perkembangan Pembelajaran</small></header>
+<main>
+<div class="note" id="mode"></div>
+<div class="card"><h2>Identitas</h2><div class="grid">
+<div><label>Guru pengajar</label><select id="guru"></select></div>
+<div><label>Nama siswa</label><select id="siswa"></select></div>
+<div><label>Alat musik</label><select id="alat"></select></div>
+<div><label>Level</label><input id="level"></div>
+<div><label>Kelas</label><input id="kelas"></div>
+<div><label>Periode</label><input id="periode" placeholder="mis. Nov 2026"></div>
+<div><label>Tanggal evaluasi</label><input id="tgl" type="date"></div>
+<div><label>Nama orang tua/wali</label><input id="ortu"></div></div></div>
+<div id="secs"></div>
+<div class="card"><h2>E. Rekap Perkembangan (otomatis)</h2><div class="rk" id="rekap"></div></div>
+<div class="card"><h2>F. Target Periode Berikutnya</h2><div id="tg"></div></div>
+<div class="card"><h2>G. Rekomendasi Latihan di Rumah</h2>
+<label>Durasi / hari</label><div class="chk" id="dur"></div>
+<label>Fokus latihan</label><div class="chk" id="fok"></div>
+<label>Catatan untuk orang tua</label><textarea id="cOrtu"></textarea></div>
+<div class="card"><h2>H. Pesan Guru</h2><label>Catatan khusus</label><textarea id="cKhusus"></textarea></div>
+<div class="card ket"><b>Keterangan nilai:</b> 4 Sangat Baik · 3 Baik · 2 Berkembang · 1 Perlu Bimbingan</div>
+<button class="btn" id="go">Buat PDF &amp; Simpan</button>
+<div class="note" id="st" style="font-weight:600"></div><div class="note">PDF terunduh otomatis. Data juga tersimpan ke Google Sheets (sheet "Rapor").</div>
+</main>
+<div id="stage"><div id="rapor"></div></div>
+<script>
+// ===== KONFIGURASI =====
+const SCRIPT_URL=''; // tempel URL Web App Apps Script di sini
+const SAMPLE=[{siswa:'Siswa Contoh A',guru:'Guru Contoh 1',alat:'Piano'},{siswa:'Siswa Contoh B',guru:'Guru Contoh 1',alat:'Vocal'},{siswa:'Siswa Contoh C',guru:'Guru Contoh 2',alat:'Gitar'}];
+// ===== KOMPETENSI PER ALAT =====
+const T={
+Biola:{A:'Menghafal melodi|Ketepatan nada|Ketepatan ritme|Kelancaran lagu|Artikulasi bowing|Ekspresi & musikalitas',B:'Mengenal notasi balok|Nilai not|Tanda birama|Tempo|Dinamik|Membaca notasi',Ct:'TANGGA NADA & TEKNIK BIOLA',C:'Postur memegang biola|Posisi tangan kiri|Pegangan bow|Straight bow|Detache|Legato|Fingering|Tangga nada',Dt:'SOLFEGIO / MUSICAL EAR',D:'Mengenali tinggi-rendah nada|Menirukan nada|Solmisasi|Membaca melodi|Mengenali interval|Ketepatan intonasi|Ketepatan ritme',F:'REPERTOIRE|BOWING & FINGERING|TANGGA NADA|SOLFEGIO'},
+Drum:{A:'Menghafal struktur lagu|Ketepatan tempo|Ketepatan ritme|Memainkan groove|Fill in & transisi|Dinamika & musikalitas',B:'Mengenal notasi ritme|Nilai not|Tanda birama|Tempo & metronom|Struktur lagu|Membaca pola ritme',Ct:'RUDIMENT & TEKNIK DRUM',C:'Grip & posisi tubuh|Single stroke|Double stroke|Paradiddle|Koordinasi tangan-kaki|Kick & hi-hat control|Snare control|Fill dasar',Dt:'RHYTHM & MUSICAL EAR',D:'Menirukan pola ritme|Menjaga steady beat|Mengenali tempo|Membedakan pola ritme|Bermain dengan metronom|Bermain mengikuti musik',F:'SONG|RUDIMENT & TEKNIK|RHYTHM|MUSICALITY'},
+Gitar:{A:'Menghafal lagu|Ketepatan chord|Ketepatan ritme|Kelancaran perpindahan chord|Strumming/picking|Ekspresi & musikalitas',B:'Mengenal notasi/tab|Nilai not|Tanda birama|Tempo|Dinamik|Membaca chord diagram/tab',Ct:'CHORD & TEKNIK GITAR',C:'Postur & posisi tangan|Fingering|Open chord|Perpindahan chord|Strumming|Picking|Barre chord|Tangga nada dasar',Dt:'RHYTHM / SOLFEGIO',D:'Menirukan pola ritme|Menjaga steady beat|Mengenali melodi|Solmisasi sederhana|Mengenali interval|Bermain dengan metronom|Mengikuti tempo',F:'REPERTOIRE|CHORD & TEKNIK|RHYTHM|MUSICAL EAR'},
+Piano:{A:'Menghafal melodi|Ketepatan nada|Ketepatan ritme|Kelancaran memainkan lagu|Artikulasi|Ekspresi & musikalitas',B:'Mengenal notasi balok|Nilai not|Tanda birama|Tanda tempo|Tanda dinamik|Membaca notasi',Ct:'TANGGA NADA & TEKNIK PIANO',C:'Postur & posisi tangan|Fingering|Koordinasi kedua tangan|Tangga nada|Arpeggio dasar|Legato & staccato|Independensi jari|Kontrol dinamika',Dt:'SOLFEGIO / MUSICAL EAR',D:'Mengenali tinggi-rendah nada|Menirukan nada|Solmisasi|Membaca not dengan solmisasi|Mengenali interval|Ketepatan nada|Ketepatan ritme',F:'REPERTOIRE|THEORY|TANGGA NADA & TEKNIK|SOLFEGIO'},
+Vocal:{A:'Menghafal lirik|Ketepatan melodi|Ketepatan ritme|Intonasi|Artikulasi lirik|Ekspresi & interpretasi',B:'Mengenal notasi|Nilai not & ritme|Tanda birama|Tempo|Dinamik|Membaca melodi sederhana',Ct:'TEKNIK VOCAL',C:'Postur|Pernapasan diafragma|Vocal warm-up|Resonansi|Artikulasi|Kontrol suara|Range vokal|Dinamika & phrasing',Dt:'SOLFEGIO / MUSICAL EAR',D:'Mengenali tinggi-rendah nada|Menirukan nada|Solmisasi|Membaca melodi|Mengenali interval|Menjaga pitch|Menjaga ritme',F:'REPERTOIRE|TEKNIK VOCAL|INTONASI|SOLFEGIO'}};
+const DUR=['10–15 menit','15–20 menit','20–30 menit','30+ menit'],FOK=['Materi lagu','Teknik','Theory','Solfegio/Rhythm','Metronom','Review materi'];
+const RK=['Song / Repertoire','Theory','Teknik Utama','Musical Ear / Solfegio'];
+const msg=(t,err)=>{const e=document.getElementById('st');e.textContent=t;e.style.color=err?'#b91c1c':'#047857'};const $=i=>document.getElementById(i),esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let DATA=[],S={};
+const secs=a=>{const t=T[a];return[['A','A. SONG / REPERTOIRE',t.A.split('|')],['B','B. THEORY / TEORI MUSIK',t.B.split('|')],['C','C. '+t.Ct,t.C.split('|')],['D','D. '+t.Dt,t.D.split('|')]]};
+const opts=(el,arr,ph)=>{el.innerHTML=(ph?'<option value="">'+ph+'</option>':'')+arr.map(v=>'<option>'+esc(v)+'</option>').join('')};
+const uniq=a=>[...new Set(a)].sort();
+function avg(k,a){const n=secs(a).find(s=>s[0]==k)[2].map((_,i)=>S[k+i]).filter(Boolean);return n.length?n.reduce((x,y)=>x+y,0)/n.length:null}
+const f1=v=>v==null?'–':(Math.round(v*10)/10).toString().replace('.',',');
+function overall(a){const v=['A','B','C','D'].map(k=>avg(k,a)).filter(x=>x!=null);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null}
+function renderForm(){const a=$('alat').value;if(!a){$('secs').innerHTML='';$('tg').innerHTML='';$('rekap').innerHTML='';return}
+ $('secs').innerHTML=secs(a).map(([k,t,items])=>'<div class="card"><h2>'+esc(t)+'</h2>'+items.map((n,i)=>'<div class="row"><span>'+esc(n)+'</span><div class="sc" data-k="'+k+i+'">'+[1,2,3,4].map(v=>'<button type="button" data-v="'+v+'" class="'+(S[k+i]==v?'on':'')+'">'+v+'</button>').join('')+'</div></div>').join('')+'<label style="margin-top:8px">Catatan guru</label><textarea id="cat'+k+'"></textarea></div>').join('');
+ $('tg').innerHTML=T[a].F.split('|').map((l,i)=>'<label>'+esc(l)+'</label><input id="tg'+i+'" style="margin-bottom:8px">').join('');upd()}
+function upd(){const a=$('alat').value;if(!a)return;$('rekap').innerHTML=RK.map((n,i)=>'<span>'+n+'</span><b>'+f1(avg('ABCD'[i],a))+' / 4</b>').join('')+'<span><b>Perkembangan Keseluruhan</b></span><b>'+f1(overall(a))+' / 4</b>'}
+$('secs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=b.parentNode.dataset.k;S[k]=+b.dataset.v;[...b.parentNode.children].forEach(x=>x.classList.toggle('on',x==b));upd()});
+opts($('dur'),[]);$('dur').innerHTML=DUR.map(d=>'<label><input type="radio" name="dur" value="'+d+'">'+d+'</label>').join('');
+$('fok').innerHTML=FOK.map(d=>'<label><input type="checkbox" value="'+d+'">'+d+'</label>').join('');
+$('guru').onchange=()=>{const g=$('guru').value;opts($('siswa'),uniq(DATA.filter(r=>r.guru==g).map(r=>r.siswa)),'— pilih siswa —');$('siswa').onchange()};
+$('siswa').onchange=()=>{const m=DATA.filter(r=>r.guru==$('guru').value&&r.siswa==$('siswa').value).map(r=>String(r.alat).trim()).map(x=>Object.keys(T).find(k=>k.toLowerCase()==x.toLowerCase())).filter(Boolean);const l=m.length?uniq(m):Object.keys(T);const old=$('alat').value;opts($('alat'),l,l.length>1?'— pilih alat —':'');if(l.includes(old))$('alat').value=old;if(l.length==1)$('alat').value=l[0];S={};renderForm()};
+$('alat').onchange=()=>{S={};renderForm()};
+function build(d){const a=d.alat,b=secs(a);
+ const tb=b.map(([k,t,items])=>'<div class="sec"><div class="sh">'+esc(t)+'</div><table><tr><th>Kompetensi</th><th>Nilai</th></tr>'+items.map((n,i)=>'<tr><td>'+esc(n)+'</td><td class="n">'+(S[k+i]||'___')+' / 4</td></tr>').join('')+'</table><div class="ct"><b>Catatan guru:</b> '+esc($('cat'+k).value)+'</div></div>').join('');
+ const rk='<div class="sec"><div class="sh">E. REKAP PERKEMBANGAN</div><table><tr><th>Bidang</th><th>Nilai</th></tr>'+RK.map((n,i)=>'<tr><td>'+n+'</td><td class="n">'+f1(avg('ABCD'[i],a))+' / 4</td></tr>').join('')+'<tr><td><b>Perkembangan Keseluruhan</b></td><td class="n"><b>'+f1(overall(a))+' / 4</b></td></tr></table></div>';
+ const ket='<div class="sec"><div class="sh">KETERANGAN NILAI</div><div class="ct">4 — SANGAT BAIK: menguasai materi dan mampu menerapkannya secara mandiri.<br>3 — BAIK: memahami dan menerapkan materi dengan sedikit bimbingan.<br>2 — BERKEMBANG: mulai memahami materi dan masih membutuhkan latihan.<br>1 — PERLU BIMBINGAN: membutuhkan pendampingan dan latihan lebih konsisten.</div></div>';
+ const tg='<div class="sec"><div class="sh">F. TARGET PERIODE BERIKUTNYA</div><table>'+T[a].F.split('|').map((l,i)=>'<tr><td style="width:170px"><b>'+esc(l)+'</b></td><td>'+esc($('tg'+i).value)+'</td></tr>').join('')+'</table></div>';
+ const g='<div class="sec"><div class="sh">G. REKOMENDASI LATIHAN DI RUMAH</div><div class="ct"><b>Durasi:</b> '+DUR.map(x=>(d.dur==x?'☑ ':'☐ ')+x).join(' &nbsp; ')+' / hari<br><b>Fokus latihan:</b> '+FOK.map(x=>(d.fokus.includes(x)?'☑ ':'☐ ')+x).join(' &nbsp; ')+'<br><b>Catatan untuk orang tua:</b> '+esc(d.cOrtu)+'</div></div>';
+ const h='<div class="sec"><div class="sh">H. PESAN GURU</div><div class="ct"><i>“Setiap anak memiliki proses belajar yang berbeda. Yang terpenting adalah konsistensi, keberanian mencoba, dan perkembangan dari waktu ke waktu.”</i><br><b>Catatan khusus:</b> '+esc(d.cKhusus)+'</div></div>';
+ $('rapor').innerHTML='<h1>DOREMI HOME MUSIC COURSE</h1><h2>LAPOR PERKEMBANGAN PEMBELAJARAN '+a.toUpperCase()+'</h2><div class="meta"><div><b>Nama Siswa:</b> '+esc(d.siswa)+'</div><div><b>Level:</b> '+esc(d.level)+'</div><div><b>Nama Guru:</b> '+esc(d.guru)+'</div><div><b>Periode:</b> '+esc(d.periode)+'</div><div><b>Tanggal Evaluasi:</b> '+esc(d.tanggal)+'</div><div><b>Kelas:</b> '+esc(d.kelas)+'</div></div>'+tb+rk+ket+tg+g+h+'<div class="sg"><div>Guru Pengajar<div class="ln"></div>Nama: '+esc(d.guru)+'</div><div>Orang Tua/Wali<div class="ln"></div>Nama: '+esc(d.ortu)+'</div></div><div class="ft"><b>DOREMI HOME MUSIC COURSE</b><br>“Belajar Musik, Tumbuh Bersama Musik.”</div>'}
+$('go').onclick=async()=>{const a=$('alat').value,s=$('siswa').value;if(!a||!s){msg('Pilih guru, siswa, dan alat musik dulu.',1);return}
+ const miss=secs(a).reduce((n,[k,,it])=>n+it.filter((_,i)=>!S[k+i]).length,0);if(miss)msg(miss+' kompetensi belum dinilai, PDF tetap dibuat.');
+ const d={siswa:s,guru:$('guru').value,alat:a,level:$('level').value,kelas:$('kelas').value,periode:$('periode').value,tanggal:$('tgl').value,ortu:$('ortu').value,dur:(document.querySelector('input[name=dur]:checked')||{}).value||'',fokus:[...document.querySelectorAll('#fok input:checked')].map(x=>x.value),cOrtu:$('cOrtu').value,cKhusus:$('cKhusus').value,rekap:'ABCD'.split('').map(k=>avg(k,a)),overall:overall(a),skor:S};
+ build(d);$('go').disabled=true;$('go').textContent='Membuat PDF…';window.scrollTo(0,0);await new Promise(r=>setTimeout(r,150));
+ try{await html2pdf().set({margin:6,filename:'Rapor_'+a+'_'+s.replace(/\s+/g,'_')+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,scrollX:0,scrollY:0,x:0,y:0,width:794,windowWidth:794,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4'},pagebreak:{mode:['css','legacy'],avoid:'.sec'}}).from($('rapor')).save();msg('PDF selesai dibuat. Cek folder Downloads.')}catch(e){msg('Gagal membuat PDF: '+e.message,1)}
+ if(SCRIPT_URL){try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(d)})}catch(e){}}
+ $('go').disabled=false;$('go').textContent='Buat PDF & Simpan'};
+(async()=>{if(SCRIPT_URL){try{DATA=await(await fetch(SCRIPT_URL+'?action=siswaGuru')).json()}catch(e){}}
+ if(!DATA.length){DATA=SAMPLE;$('mode').textContent='Mode contoh: isi SCRIPT_URL agar data siswa & guru diambil dari sheet.'}
+ opts($('guru'),uniq(DATA.map(r=>r.guru)),'— pilih guru —');opts($('siswa'),[],'— pilih siswa —');opts($('alat'),[],'');$('tgl').valueAsDate=new Date()})();
+</script></body></html>
