@@ -3,34 +3,38 @@
 <title>Rapor Perkembangan – Doremi Home Music Course</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
-:root{--ac:#ea580c;--bg:#f5f6fa;--cd:#fff;--bd:#dfe2ea;--tx:#1f2430;--mu:#6b7280}
+:root{--ac:#6b1d2a;--gd:#9a7b43;--bg:#f2f3f5;--cd:#fff;--bd:#d3d7de;--tx:#1b2230;--mu:#5b6575;--sf:Georgia,"Times New Roman",serif}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--tx)}
-header{background:var(--ac);color:#fff;padding:18px 16px;text-align:center}header h1{margin:0;font-size:1.15rem}header small{opacity:.85}
-main{max-width:760px;margin:0 auto;padding:14px}
-.card{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
-.card h2{margin:0 0 10px;font-size:1rem;color:var(--ac)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+header{background:var(--ac);color:#fff;padding:22px 16px 18px;text-align:center;border-bottom:4px solid var(--gd)}
+header h1{margin:0;font-family:var(--sf);font-size:1.3rem;font-weight:700;letter-spacing:.08em}header small{display:block;margin-top:4px;opacity:.8;font-family:var(--sf);font-style:italic}
+main{max-width:760px;margin:0 auto;padding:16px 14px}
+.card{background:var(--cd);border:1px solid var(--bd);border-top:3px solid var(--ac);border-radius:3px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--bd);font-family:var(--sf);font-size:1rem;font-weight:700;color:var(--ac)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:560px){.grid{grid-template-columns:1fr}}
 label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:3px}
-input,select,textarea{width:100%;padding:9px;border:1px solid var(--bd);border-radius:8px;font:inherit;background:#fff;color:var(--tx)}
+input,select,textarea{width:100%;padding:9px;border:1px solid #b9bfca;border-radius:3px;font:inherit;background:#fff;color:var(--tx)}
+input:focus,select:focus,textarea:focus,.sc button:focus-visible,.btn:focus-visible{outline:2px solid var(--gd);outline-offset:1px}
 textarea{min-height:56px;resize:vertical}
-.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed var(--bd)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #e6e9ee}
 .row span{font-size:.92rem;flex:1}
-.sc{display:flex;gap:5px}.sc button{width:38px;height:38px;border-radius:8px;border:1px solid var(--bd);background:#fff;font-weight:600;cursor:pointer;color:var(--tx)}
+.sc{display:flex;gap:4px}.sc button{width:38px;height:36px;border-radius:3px;border:1px solid #b9bfca;background:#fff;font-weight:600;cursor:pointer;color:var(--tx)}
 .sc button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.rk{display:grid;grid-template-columns:1fr auto;gap:6px;font-size:.92rem}.rk b{text-align:right}
+.rk{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:.92rem}.rk b{text-align:right;font-family:var(--sf)}
 .chk label{display:inline-flex;align-items:center;gap:5px;margin:0 12px 6px 0;font-size:.9rem;color:var(--tx)}.chk input{width:auto}
-.btn{width:100%;padding:13px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:1rem;font-weight:600;cursor:pointer}
+.btn{width:100%;padding:14px;border:0;border-bottom:3px solid var(--gd);border-radius:3px;background:var(--ac);color:#fff;font-family:var(--sf);font-size:1rem;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.btn:disabled{opacity:.7;cursor:wait}
 .note{font-size:.78rem;color:var(--mu);text-align:center;margin:6px 0}
 .ket{font-size:.8rem;color:var(--mu);line-height:1.5}
 #stage{position:fixed;left:-10000px;top:0}
-#rapor{width:794px;min-width:794px;max-width:794px;margin:0;padding:28px 34px;background:#fff;color:#111;font:12px/1.4 Arial,sans-serif}
-#rapor h1{text-align:center;margin:0;font-size:18px;color:#c2410c}#rapor h2{text-align:center;margin:2px 0 10px;font-size:13px}
-#rapor .meta{display:grid;grid-template-columns:1fr 1fr;gap:3px 20px;margin-bottom:8px}
-#rapor .sec{break-inside:avoid;margin-top:9px}#rapor .sh{background:#c2410c;color:#fff;padding:3px 7px;font-weight:700;font-size:12px}
-#rapor table{width:100%;border-collapse:collapse}#rapor td,#rapor th{border:1px solid #bbb;padding:2px 6px}#rapor td.n{width:70px;text-align:center}
-#rapor th{background:#ffedd5;text-align:left}.ct{border:1px solid #bbb;border-top:0;padding:3px 6px;min-height:20px}
-#rapor .sg{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:14px;text-align:center}#rapor .ln{border-bottom:1px solid #111;height:46px;margin:4px 20px}
-#rapor .ft{text-align:center;margin-top:12px;font-size:11px;color:#444}
+#rapor{width:794px;min-width:794px;max-width:794px;margin:0;padding:30px 36px;background:#fff;color:#111;font:12px/1.45 "Times New Roman",Georgia,serif}
+#rapor h1{text-align:center;margin:0;font-size:20px;letter-spacing:2px;color:#6b1d2a}
+#rapor h2{text-align:center;margin:3px 0 12px;padding-bottom:8px;font-size:13px;letter-spacing:1px;border-bottom:3px double #6b1d2a}
+#rapor .meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;margin-bottom:10px;padding:6px 8px;border:1px solid #999}
+#rapor .sec{break-inside:avoid;margin-top:10px}#rapor .sh{background:#6b1d2a;color:#fff;padding:4px 8px;font-weight:700;font-size:12px;letter-spacing:.5px;border-bottom:2px solid #9a7b43}
+#rapor table{width:100%;border-collapse:collapse}#rapor td,#rapor th{border:1px solid #999;padding:3px 6px}#rapor td.n{width:70px;text-align:center}
+#rapor th{background:#f4e8ea;text-align:left}.ct{border:1px solid #999;border-top:0;padding:4px 7px;min-height:20px}
+#rapor .sg{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:16px;text-align:center}#rapor .ln{border-bottom:1px solid #111;height:50px;margin:4px 20px}
+#rapor .ft{text-align:center;margin-top:14px;padding-top:8px;border-top:3px double #6b1d2a;font-size:11px;color:#333}
 </style></head><body>
 <header><h1>DOREMI HOME MUSIC COURSE</h1><small>Form Lapor Perkembangan Pembelajaran</small></header>
 <main>
