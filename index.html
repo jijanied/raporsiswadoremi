@@ -160,10 +160,11 @@ const saveLocal=d=>{try{const a=loadLocal();a.unshift(d);localStorage.setItem(LK
 function norm(r){let o=Object.assign({},r);if(typeof r.json==='string'&&r.json){try{o=Object.assign(o,JSON.parse(r.json))}catch(e){}}
  ['skor','cat','rekap','tg','fokus'].forEach(k=>{if(typeof o[k]==='string'&&o[k]){try{o[k]=JSON.parse(o[k])}catch(e){o[k]=null}}});
  o.skor=o.skor||{};return o}
-async function loadHist(){$('hInfo').textContent='Memuat riwayat…';let s=[];
- if(SCRIPT_URL){try{const x=await(await fetch(SCRIPT_URL+'?action=riwayat')).json();if(Array.isArray(x))s=x.map(norm)}catch(e){}}
+async function loadHist(){$('hInfo').textContent='Memuat riwayat…';let s=[],ok=false;
+ if(SCRIPT_URL){try{const x=await(await fetch(SCRIPT_URL+'?action=riwayat')).json();if(Array.isArray(x)){s=x.map(norm);ok=true}}catch(e){}}
  const seen=new Set(s.map(r=>r.ts).filter(Boolean));
- HIST=s.concat(loadLocal().map(norm).filter(r=>!r.ts||!seen.has(r.ts))).filter(r=>r.siswa);
+ if(ok){try{localStorage.removeItem(LK)}catch(e){}}  // server = sumber utama; cache lokal hanya dipakai kalau server tidak terjangkau
+ HIST=(ok?s:s.concat(loadLocal().map(norm).filter(r=>!r.ts||!seen.has(r.ts)))).filter(r=>r.siswa);
  HIST.sort((a,b)=>String(b.ts||b.tanggal||'').localeCompare(String(a.ts||a.tanggal||'')));
  HLOADED=true;fillHF();rh0()}
 function fillHF(){const g=$('hGuru').value,sw=$('hSiswa').value,al=$('hAlat').value;
