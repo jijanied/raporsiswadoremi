@@ -34,6 +34,14 @@ textarea{min-height:56px;resize:vertical}
 .bt{margin-top:12px;display:flex;gap:8px}
 .mini{padding:8px 12px;border:1px solid var(--ac);border-radius:3px;background:#fff;color:var(--ac);font-weight:600;cursor:pointer}.mini:hover{background:var(--ac);color:#fff}.mini:disabled{opacity:.6;cursor:wait}
 .empty{text-align:center;color:var(--mu);padding:28px 10px;font-size:.9rem}
+details.hc{padding:0}details.hc summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;cursor:pointer}
+details.hc summary::-webkit-details-marker{display:none}
+details.hc summary::after{content:"▾";color:var(--mu);font-size:.9rem;transition:transform .15s}details.hc[open] summary::after{transform:rotate(180deg)}
+details.hc[open] summary{border-bottom:1px solid var(--bd)}
+.sm{flex:1;min-width:0}.sm b{display:block;font-family:var(--sf);color:var(--ac);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc .ov{font-size:1rem;min-width:46px;padding:2px 6px}.hc .ov small{display:inline;margin-left:2px}
+.hb{padding:12px 14px 14px}
+#hMoreW{text-align:center;margin:4px 0 14px}
 #stage{position:fixed;left:-10000px;top:0}
 #rapor{width:794px;min-width:794px;max-width:794px;margin:0;padding:0;background:#fff;color:#111;font:12px/1.45 "Times New Roman",Georgia,serif}
 #rapor .pg{width:794px;height:1110px;padding:30px 36px;box-sizing:border-box;overflow:hidden;position:relative;background:#fff}#rapor .pg+.pg{page-break-before:always}#rapor .pn{position:absolute;left:36px;right:36px;bottom:12px;padding-top:5px;border-top:3px double #6b1d2a;text-align:center;font-size:10px;color:#333}#rapor h1{text-align:center;margin:0;font-size:20px;letter-spacing:2px;color:#6b1d2a}
@@ -157,7 +165,7 @@ async function loadHist(){$('hInfo').textContent='Memuat riwayat…';let s=[];
  const seen=new Set(s.map(r=>r.ts).filter(Boolean));
  HIST=s.concat(loadLocal().map(norm).filter(r=>!r.ts||!seen.has(r.ts))).filter(r=>r.siswa);
  HIST.sort((a,b)=>String(b.ts||b.tanggal||'').localeCompare(String(a.ts||a.tanggal||'')));
- HLOADED=true;fillHF();renderHist()}
+ HLOADED=true;fillHF();rh0()}
 function fillHF(){const g=$('hGuru').value,sw=$('hSiswa').value,al=$('hAlat').value;
  opts($('hGuru'),uniq(HIST.map(r=>r.guru).filter(Boolean)),'Semua guru');$('hGuru').value=g;
  const base=HIST.filter(r=>!$('hGuru').value||r.guru==$('hGuru').value);
@@ -165,14 +173,18 @@ function fillHF(){const g=$('hGuru').value,sw=$('hSiswa').value,al=$('hAlat').va
  opts($('hAlat'),uniq(HIST.map(r=>r.alat).filter(Boolean)),'Semua alat');$('hAlat').value=al}
 const hFilt=()=>{const g=$('hGuru').value,s=$('hSiswa').value,a=$('hAlat').value,q=$('hQ').value.trim().toLowerCase();
  return HIST.map((r,i)=>[r,i]).filter(([r])=>(!g||r.guru==g)&&(!s||r.siswa==s)&&(!a||r.alat==a)&&(!q||String(r.periode||'').toLowerCase().includes(q)))};
-function renderHist(){const L=hFilt();$('hInfo').textContent=HIST.length?L.length+' dari '+HIST.length+' rapor':'';
- $('hList').innerHTML=L.length?L.map(([r,i])=>{const rek=Array.isArray(r.rekap)?r.rekap:[];const ok=T[r.alat]&&Object.keys(r.skor).length;
-  return '<div class="card"><div class="hh"><div><b>'+esc(r.siswa)+'</b><div class="ket">'+esc(r.alat)+(r.level?' · Level '+esc(r.level):'')+(r.kelas?' · '+esc(r.kelas):'')+'<br>Periode: '+esc(r.periode||'–')+' · Evaluasi: '+esc(r.tanggal||'–')+'<br>Guru: '+esc(r.guru||'–')+'</div></div><div class="ov">'+f1(r.overall)+'<small>/ 4</small></div></div>'
+let HN=10;
+function renderHist(){const L=hFilt(),sh=L.slice(0,HN);$('hInfo').textContent=HIST.length?L.length+' dari '+HIST.length+' rapor':'';
+ $('hList').innerHTML=(sh.length?sh.map(([r,i])=>{const rek=Array.isArray(r.rekap)?r.rekap:[];const ok=T[r.alat]&&Object.keys(r.skor).length;
+  return '<details class="card hc"><summary><div class="sm"><b>'+esc(r.siswa)+'</b><span class="ket">'+esc(r.alat)+' · '+esc(r.periode||'–')+' · '+esc(r.tanggal||'–')+'</span></div><div class="ov">'+f1(r.overall)+'<small>/ 4</small></div></summary><div class="hb">'
+  +'<div class="ket" style="margin-bottom:10px">'+(r.level?'Level '+esc(r.level):'')+(r.kelas?' · Kelas '+esc(r.kelas):'')+'<br>Guru: '+esc(r.guru||'–')+'</div>'
   +'<div class="rk">'+RK.map((n,k)=>'<span>'+n+'</span><b>'+f1(rek[k])+' / 4</b>').join('')+'</div>'
-  +'<div class="bt"><button type="button" class="mini" data-i="'+i+'"'+(ok?'':' disabled title="Data nilai tidak lengkap"')+'>⬇ Unduh ulang PDF</button></div></div>'}).join(''):'<div class="empty">'+(HIST.length?'Tidak ada rapor yang cocok dengan filter.':'Belum ada riwayat rapor.')+'</div>'}
-['hGuru','hSiswa','hAlat'].forEach(id=>$(id).onchange=()=>{if(id=='hGuru')$('hSiswa').value='';fillHF();renderHist()});
-$('hQ').oninput=renderHist;$('hRef').onclick=loadHist;
-$('hList').addEventListener('click',async e=>{const b=e.target.closest('button[data-i]');if(!b)return;const r=HIST[+b.dataset.i];if(!r)return;
+  +'<div class="bt"><button type="button" class="mini" data-i="'+i+'"'+(ok?'':' disabled title="Data nilai tidak lengkap"')+'>⬇ Unduh ulang PDF</button></div></div></details>'}).join(''):'<div class="empty">'+(HIST.length?'Tidak ada rapor yang cocok dengan filter.':'Belum ada riwayat rapor.')+'</div>')
+  +(L.length>HN?'<div id="hMoreW"><button type="button" class="mini" id="hMore">Tampilkan lebih banyak ('+(L.length-HN)+' lagi)</button></div>':'')}
+const rh0=()=>{HN=10;renderHist()};
+['hGuru','hSiswa','hAlat'].forEach(id=>$(id).onchange=()=>{if(id=='hGuru')$('hSiswa').value='';fillHF();rh0()});
+$('hQ').oninput=rh0;$('hRef').onclick=loadHist;
+$('hList').addEventListener('click',async e=>{if(e.target.closest('#hMore')){HN+=10;renderHist();return}const b=e.target.closest('button[data-i]');if(!b)return;const r=HIST[+b.dataset.i];if(!r)return;
  const old=S,t=b.textContent;b.disabled=true;b.textContent='Membuat PDF…';S=r.skor;
  try{build(r);await mkpdf(r)}catch(x){alert('Gagal membuat PDF: '+x.message)}
  S=old;b.disabled=false;b.textContent=t});
