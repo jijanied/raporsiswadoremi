@@ -65,7 +65,7 @@ details.hc[open] summary{border-bottom:1px solid var(--bd)}
 <div><label>Alat musik</label><select id="alat"></select></div>
 <div><label>Level</label><input id="level"></div>
 <div><label>Kelas</label><input id="kelas"></div>
-<div><label>Periode</label><input id="periode" placeholder="mis. Nov 2026"></div>
+<div><label>Periode</label><div style="display:flex;gap:8px"><select id="pBln" aria-label="Bulan"></select><select id="pThn" aria-label="Tahun"></select></div><input id="periode" type="hidden"></div>
 <div><label>Tanggal evaluasi</label><input id="tgl" type="date"></div>
 <div><label>Nama orang tua/wali</label><input id="ortu"></div><div><label>Nama guru di kolom tanda tangan</label><input id="gTtd" placeholder="kosongkan jika ingin ditulis tangan"></div></div></div>
 <div id="secs"></div>
@@ -87,7 +87,7 @@ details.hc[open] summary{border-bottom:1px solid var(--bd)}
 <div><label>Guru</label><select id="hGuru"></select></div>
 <div><label>Siswa</label><select id="hSiswa"></select></div>
 <div><label>Alat musik</label><select id="hAlat"></select></div>
-<div><label>Cari periode</label><input id="hQ" placeholder="mis. Nov 2026"></div></div>
+<div><label>Periode</label><select id="hQ"></select></div></div>
 <div class="bt"><button type="button" class="mini" id="hRef">↻ Muat ulang</button></div>
 <div class="note" id="hInfo"></div></div>
 <div id="hList"></div>
@@ -170,9 +170,10 @@ function fillHF(){const g=$('hGuru').value,sw=$('hSiswa').value,al=$('hAlat').va
  opts($('hGuru'),uniq(HIST.map(r=>r.guru).filter(Boolean)),'Semua guru');$('hGuru').value=g;
  const base=HIST.filter(r=>!$('hGuru').value||r.guru==$('hGuru').value);
  opts($('hSiswa'),uniq(base.map(r=>r.siswa)),'Semua siswa');$('hSiswa').value=sw;
- opts($('hAlat'),uniq(HIST.map(r=>r.alat).filter(Boolean)),'Semua alat');$('hAlat').value=al}
-const hFilt=()=>{const g=$('hGuru').value,s=$('hSiswa').value,a=$('hAlat').value,q=$('hQ').value.trim().toLowerCase();
- return HIST.map((r,i)=>[r,i]).filter(([r])=>(!g||r.guru==g)&&(!s||r.siswa==s)&&(!a||r.alat==a)&&(!q||String(r.periode||'').toLowerCase().includes(q)))};
+ opts($('hAlat'),uniq(HIST.map(r=>r.alat).filter(Boolean)),'Semua alat');$('hAlat').value=al;
+ const pq=$('hQ').value;opts($('hQ'),[...new Set(HIST.map(r=>r.periode).filter(Boolean))],'Semua periode');$('hQ').value=pq}
+const hFilt=()=>{const g=$('hGuru').value,s=$('hSiswa').value,a=$('hAlat').value,q=$('hQ').value;
+ return HIST.map((r,i)=>[r,i]).filter(([r])=>(!g||r.guru==g)&&(!s||r.siswa==s)&&(!a||r.alat==a)&&(!q||r.periode==q))};
 let HN=10;
 function renderHist(){const L=hFilt(),sh=L.slice(0,HN);$('hInfo').textContent=HIST.length?L.length+' dari '+HIST.length+' rapor':'';
  $('hList').innerHTML=(sh.length?sh.map(([r,i])=>{const rek=Array.isArray(r.rekap)?r.rekap:[];const ok=T[r.alat]&&Object.keys(r.skor).length;
@@ -183,7 +184,7 @@ function renderHist(){const L=hFilt(),sh=L.slice(0,HN);$('hInfo').textContent=HI
   +(L.length>HN?'<div id="hMoreW"><button type="button" class="mini" id="hMore">Tampilkan lebih banyak ('+(L.length-HN)+' lagi)</button></div>':'')}
 const rh0=()=>{HN=10;renderHist()};
 ['hGuru','hSiswa','hAlat'].forEach(id=>$(id).onchange=()=>{if(id=='hGuru')$('hSiswa').value='';fillHF();rh0()});
-$('hQ').oninput=rh0;$('hRef').onclick=loadHist;
+$('hQ').onchange=rh0;$('hRef').onclick=loadHist;
 $('hList').addEventListener('click',async e=>{if(e.target.closest('#hMore')){HN+=10;renderHist();return}const b=e.target.closest('button[data-i]');if(!b)return;const r=HIST[+b.dataset.i];if(!r)return;
  const old=S,t=b.textContent;b.disabled=true;b.textContent='Membuat PDF…';S=r.skor;
  try{build(r);await mkpdf(r)}catch(x){alert('Gagal membuat PDF: '+x.message)}
@@ -195,5 +196,8 @@ $('tForm').onclick=()=>tab(false);$('tHist').onclick=()=>tab(true);
 
 (async()=>{if(SCRIPT_URL){try{DATA=await(await fetch(SCRIPT_URL+'?action=siswaGuru')).json()}catch(e){}}
  if(!DATA.length){DATA=SAMPLE;$('mode').textContent='Mode contoh: isi SCRIPT_URL agar data siswa & guru diambil dari sheet.'}
+ const BLN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'],now=new Date(),setPer=()=>{$('periode').value=$('pBln').value+' '+$('pThn').value};
+ $('pBln').innerHTML=BLN.map(b=>'<option>'+b+'</option>').join('');$('pThn').innerHTML=[now.getFullYear()-1,now.getFullYear(),now.getFullYear()+1].map(y=>'<option>'+y+'</option>').join('');
+ $('pBln').value=BLN[now.getMonth()];$('pThn').value=now.getFullYear();$('pBln').onchange=$('pThn').onchange=setPer;setPer();
  opts($('guru'),uniq(DATA.map(r=>r.guru)),'— pilih guru —');opts($('siswa'),[],'— pilih siswa —');opts($('alat'),[],'');$('tgl').valueAsDate=new Date()})();
 </script></body></html>
